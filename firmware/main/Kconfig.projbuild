@@ -1,0 +1,84 @@
+menu "Application Configuration"
+
+    menu "I2C Bus"
+        config APP_I2C_SDA_GPIO
+            int "I2C SDA GPIO number"
+            range 0 23
+            default 6
+            help
+                GPIO used for I2C SDA line.
+
+        config APP_I2C_SCL_GPIO
+            int "I2C SCL GPIO number"
+            range 0 23
+            default 7
+            help
+                GPIO used for I2C SCL line.
+
+        config APP_I2C_FREQ_HZ
+            int "I2C clock frequency (Hz)"
+            range 100000 400000
+            default 400000
+            help
+                Standard mode: 100000, Fast mode: 400000.
+    endmenu
+
+    menu "BME280"
+        config APP_BME280_I2C_ADDR
+            hex "BME280 I2C address"
+            default 0x76
+            help
+                0x76 or 0x77 depending on SDO pin wiring.
+
+        config APP_BME280_READ_INTERVAL_MS
+            int "BME280 read interval (ms)"
+            default 10000
+            help
+                How often to poll temperature/humidity/pressure.
+    endmenu
+
+    menu "VCNL4010"
+        config APP_VCNL4010_I2C_ADDR
+            hex "VCNL4010 I2C address"
+            default 0x13    
+
+        config APP_VCNL4010_INT_GPIO
+            int "VCNL4010 interrupt GPIO"
+            default 0
+            help
+                GPIO wired to the VCNL4010 INT pin, used to wake the display.
+
+        config APP_VCNL4010_PROX_THRESHOLD
+            int "Proximity trigger threshold"
+            range 2300 65535 
+            default 2500
+            help
+                Raw proximity count above which the interrupt fires.
+    endmenu
+
+    menu "SSD1306 Display"
+        config APP_SSD1306_I2C_ADDR
+            hex "SSD1306 I2C address"
+            default 0x3C
+            help
+                0x3C or 0x3D depending on SA0/ADDR pin wiring.
+
+        config APP_DISPLAY_TIMEOUT_MS
+            int "Display auto-off timeout (ms)"
+            default 15000
+            help
+                How long the OLED stays on after a proximity wake before
+                powering off again.
+    endmenu
+
+    menu "Zigbee Device Identity"
+        config APP_ZB_MANUFACTURER_NAME
+            string "Zigbee manufacturer name"
+            default "DIY"
+
+        config APP_ZB_MODEL_IDENTIFIER
+            string "Zigbee model identifier"
+            default "ESP32C6-EnvMon"
+    endmenu
+
+endmenu
