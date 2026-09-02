@@ -4,14 +4,14 @@ menu "Application Configuration"
         config APP_I2C_SDA_GPIO
             int "I2C SDA GPIO number"
             range 0 23
-            default 6
+            default 10
             help
                 GPIO used for I2C SDA line.
 
         config APP_I2C_SCL_GPIO
             int "I2C SCL GPIO number"
             range 0 23
-            default 7
+            default 11
             help
                 GPIO used for I2C SCL line.
 
@@ -44,7 +44,7 @@ menu "Application Configuration"
 
         config APP_VCNL4010_INT_GPIO
             int "VCNL4010 interrupt GPIO"
-            default 0
+            default 12
             help
                 GPIO wired to the VCNL4010 INT pin, used to wake the display.
 
@@ -78,7 +78,7 @@ menu "Application Configuration"
 
         config APP_ZB_MODEL_IDENTIFIER
             string "Zigbee model identifier"
-            default "ESP32C6-EnvMon"
+            default "ESP32H2-EnvMon"
     endmenu
 
 endmenu

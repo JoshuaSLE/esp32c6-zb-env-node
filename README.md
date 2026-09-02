@@ -1,6 +1,6 @@
-# ESP32-C6 Zigbee Environmental Monitor
+# ESP32-H2 Zigbee Environmental Monitor
 
-Indoor environmental monitor built on the ESP32-C6, running as a Zigbee end
+Indoor environmental monitor built on the ESP32-H2, running as a Zigbee end
 device (not a router) to keep power draw low. Reports temperature, humidity,
 barometric pressure, ambient light, and proximity over Zigbee, with an
 SSD1306 OLED that wakes on a VCNL4010 proximity interrupt to show live
@@ -10,7 +10,7 @@ readings, then powers off after a timeout.
 
 | Component | Part | Role |
 |---|---|---|
-| MCU | ESP32-C6 | Zigbee end device (RCP-free, single chip) |
+| MCU | ESP32-H2 | Zigbee end device (RCP-free, single chip) |
 | Environmental sensor | Bosch BME280 | Temperature, humidity, pressure (I2C) |
 | Proximity/light sensor | Vishay VCNL4010 | Ambient light + proximity, interrupt-driven wake (I2C) |
 | Display | SSD1306 | 128x64 OLED, shows live readings on wake, sleeps after timeout (I2C, official esp-idf lcd driver) |
@@ -18,9 +18,8 @@ readings, then powers off after a timeout.
 Current build stage: dev board + breakout modules (perfboard/jumper wiring).
 Custom PCB may follow later but is out of scope for now.
 
-Power target: battery or mains powered end device. The C6 is not used as a
-Zigbee router in this project (routing keeps the radio busier and the chip
-noticeably warmer during testing).
+Power target: battery or mains powered end device. The ESP32-H2 will not used as a
+Zigbee router in this project.
 
 ## Software Stack
 
