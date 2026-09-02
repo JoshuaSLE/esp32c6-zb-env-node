@@ -21,6 +21,13 @@ menu "Application Configuration"
             default 400000
             help
                 Standard mode: 100000, Fast mode: 400000.
+
+        config APP_I2C_TIMEOUT_MS
+            int "I2C clock frequency (Hz)"
+            range 100 1000
+            default 100
+            help
+                I2C timeout.
     endmenu
 
     menu "BME280"
