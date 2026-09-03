@@ -4,7 +4,7 @@
 
 #include "esp_check.h"
 #include "esp_log.h"
-#include "esp_task.h"
+#include "freertos/FreeRTOS.h"
 
 static const char *TAG = "env_mon";
 
@@ -43,10 +43,10 @@ void app_main(void)
         ESP_ERROR_CHECK(display_off_on(panel_handle, true));
         ESP_ERROR_CHECK(display_show_readings(panel_handle, reading.temp, reading.hum, reading.press));
 
-        vTaskDelay(pdMS_TO_TICKS(5000));
+        vTaskDelay(pdMS_TO_TICKS(10000));
 
         ESP_ERROR_CHECK(display_off_on(panel_handle, false));
-        vTaskDelay(pdMS_TO_TICKS(55000));
+        vTaskDelay(pdMS_TO_TICKS(50000));
     }
 
     ESP_ERROR_CHECK(display_deinit(&panel_handle));
