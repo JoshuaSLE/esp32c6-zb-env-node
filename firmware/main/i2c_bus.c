@@ -71,3 +71,34 @@ esp_err_t i2c_bus_remove_device(i2c_master_dev_handle_t *dev_handle)
 
     return err;
 }
+
+esp_err_t i2c_bus_scan(i2c_master_bus_handle_t *bus_handle)
+{
+    if (bus_handle == NULL || *bus_handle == NULL)
+    {
+        return ESP_ERR_INVALID_ARG;
+    }
+
+    ESP_LOGI(TAG, "Scanning I2C bus...");
+    uint8_t devices_found = 0;
+
+    for (uint16_t addr = 0x08; addr <= 0x77; addr++)
+    {
+        if (i2c_master_probe(*bus_handle, addr, CONFIG_APP_I2C_TIMEOUT_MS) == ESP_OK)
+        {
+            ESP_LOGI(TAG, "Found device at address: 0x%02X", addr);
+            devices_found++;
+        }
+    }
+
+    if (devices_found == 0)
+    {
+        ESP_LOGW(TAG, "No I2C devices found");
+    }
+    else
+    {
+        ESP_LOGI(TAG, "Scan complete: found %d device(s)", devices_found);
+    }
+
+    return ESP_OK;
+}

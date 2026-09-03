@@ -43,6 +43,14 @@ extern "C"
      */
     esp_err_t i2c_bus_remove_device(i2c_master_dev_handle_t *dev_handle);
 
+    /**
+     * @brief I2C bus scan 7bit and 10bit.
+     * 
+     * @param dev_handle I2C device handle.
+     * @return esp_err_t 
+     */
+    esp_err_t i2c_bus_scan(i2c_master_bus_handle_t *bus_handle);
+
 #ifdef __cplusplus
 }
 #endif
