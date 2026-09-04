@@ -218,60 +218,31 @@ esp_err_t bme280_init(const bme280_config_t *config, bme280_handle_t *ret_handle
         return ret;
     }
 
-    ret = bme280_reg_write(dev, BME280_REG_RESET, BME280_SOFT_RESET_VAL);
-    if (ret != ESP_OK)
-    {
-        goto fail;
-    }
+    ESP_GOTO_ON_ERROR(bme280_reg_write(dev, BME280_REG_RESET, BME280_SOFT_RESET_VAL), fail, TAG, "Failed to soft reset");
     vTaskDelay(pdMS_TO_TICKS(10));
 
     uint8_t chip_id = 0;
-    ret = bme280_reg_read(dev, BME280_REG_ID, &chip_id, 1);
-    if (ret != ESP_OK)
-    {
-        goto fail;
-    }
-
+    ESP_GOTO_ON_ERROR(bme280_reg_read(dev, BME280_REG_ID, &chip_id, 1), fail, TAG, "Failed to read the chip id");
     if (chip_id != BME280_ID_VAL)
     {
         ret = ESP_ERR_NOT_FOUND;
         goto fail;
     }
 
-    ret = bme280_wait_until_ready(dev, CONFIG_APP_I2C_TIMEOUT_MS);
-    if (ret != ESP_OK)
-    {
-        goto fail;
-    }
+    ESP_GOTO_ON_ERROR(bme280_wait_until_ready(dev, CONFIG_APP_I2C_TIMEOUT_MS), fail, TAG, "Failed to wait for is to be ready");
 
-    ret = bme280_read_calibration_data(dev);
-    if (ret != ESP_OK)
-    {
-        goto fail;
-    }
+    ESP_GOTO_ON_ERROR(bme280_read_calibration_data(dev), fail, TAG, "Failed to read the calibration values");
 
-    ret = bme280_reg_write(dev, BME280_REG_CTRL_HUM, config->hum_over_sample & 0x07);
-    if (ret != ESP_OK)
-    {
-        goto fail;
-    }
+    ESP_GOTO_ON_ERROR(bme280_reg_write(dev, BME280_REG_CTRL_HUM, config->hum_over_sample & 0x07), fail, TAG, "Failed to configure the humidity over sampling");
 
     uint8_t config_reg = ((config->standby & 0x07) << 5) | ((config->filter & 0x07) << 2);
-    ret = bme280_reg_write(dev, BME280_REG_CONFIG, config_reg);
-    if (ret != ESP_OK)
-    {
-        goto fail;
-    }
+    ESP_GOTO_ON_ERROR(bme280_reg_write(dev, BME280_REG_CONFIG, config_reg), fail, TAG, "Failed to configure the configuration");
 
     dev->mode = config->mode;
     dev->ctrl_meas = ((config->temp_over_sample & 0x07) << 5) |
                      ((config->pres_over_sample & 0x07) << 2) |
                      (dev->mode & 0x03);
-    ret = bme280_reg_write(dev, BME280_REG_CTRL_MEAS, dev->ctrl_meas);
-    if (ret != ESP_OK)
-    {
-        goto fail;
-    }
+    ESP_GOTO_ON_ERROR(bme280_reg_write(dev, BME280_REG_CTRL_MEAS, dev->ctrl_meas), fail, TAG, "Failed to configure the measure");
 
     *ret_handle = dev;
     return ESP_OK;

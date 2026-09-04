@@ -48,57 +48,29 @@ esp_err_t vcnl4010_init(const vcnl4010_config_t *config, vcnl4010_handle_t *ret_
     }
 
     uint8_t product_id = 0;
-    ret = vcnl4010_reg_read(dev, VCNL4010_REG_PRODUCT_ID, &product_id, 1);
+    ESP_GOTO_ON_ERROR(vcnl4010_reg_read(dev, VCNL4010_REG_PRODUCT_ID, &product_id, 1), fail, TAG, "Failed to read product id");
     if (ret != ESP_OK || (product_id & 0xF0) != (VCNL4010_PRODUCT_ID & 0xF0))
     {
-        ret = (ret != ESP_OK) ? ret : ESP_ERR_NOT_FOUND;
+        ret = ESP_ERR_NOT_FOUND;
         goto fail;
     }
 
-    ret = vcnl4010_reg_write(dev, VCNL4010_REG_PROX_RATE, config->prox_rate);
-    if (ret != ESP_OK)
-    {
-        goto fail;
-    }
+    ESP_GOTO_ON_ERROR(vcnl4010_reg_write(dev, VCNL4010_REG_PROX_RATE, config->prox_rate), fail, TAG, "Failed to set proximity rate");
 
-    ret = vcnl4010_reg_write(dev, VCNL4010_REG_LED_CURRENT, config->led_current);
-    if (ret != ESP_OK)
-    {
-        goto fail;
-    }
+    ESP_GOTO_ON_ERROR(vcnl4010_reg_write(dev, VCNL4010_REG_LED_CURRENT, config->led_current), fail, TAG, "Failed to set LED current");
 
     uint8_t als_param = ((config->als_rate & 0x07) << 4) |
                         (config->als_auto_offset ? VCNL4010_ALS_AUTO_OFFSET_EN : 0) |
                         (config->als_average & 0x07);
-    ret = vcnl4010_reg_write(dev, VCNL4010_REG_ALS_PARAM, als_param);
-    if (ret != ESP_OK)
-    {
-        goto fail;
-    }
+    ESP_GOTO_ON_ERROR(vcnl4010_reg_write(dev, VCNL4010_REG_ALS_PARAM, als_param), fail, TAG, "Failed to set ambient light parameters");
 
-    ret = vcnl4010_reg_write(dev, VCNL4010_REG_LOW_THRES, (config->interrupt.low_threshold >> 8) & 0xFF);
-    if (ret != ESP_OK)
-    {
-        goto fail;
-    }
+    ESP_GOTO_ON_ERROR(vcnl4010_reg_write(dev, VCNL4010_REG_LOW_THRES, (config->interrupt.low_threshold >> 8) & 0xFF), fail, TAG, "Failed to set low threshold high bite");
 
-    ret = vcnl4010_reg_write(dev, VCNL4010_REG_LOW_THRES + 1, config->interrupt.low_threshold & 0xFF);
-    if (ret != ESP_OK)
-    {
-        goto fail;
-    }
+    ESP_GOTO_ON_ERROR(vcnl4010_reg_write(dev, VCNL4010_REG_LOW_THRES + 1, config->interrupt.low_threshold & 0xFF), fail, TAG, "Failed to set low threshold low bite");
 
-    ret = vcnl4010_reg_write(dev, VCNL4010_REG_HIGH_THRES, (config->interrupt.high_threshold >> 8) & 0xFF);
-    if (ret != ESP_OK)
-    {
-        goto fail;
-    }
+    ESP_GOTO_ON_ERROR(vcnl4010_reg_write(dev, VCNL4010_REG_HIGH_THRES, (config->interrupt.high_threshold >> 8) & 0xFF), fail, TAG, "Failed to set high threshold high bite");
 
-    ret = vcnl4010_reg_write(dev, VCNL4010_REG_HIGH_THRES + 1, config->interrupt.high_threshold & 0xFF);
-    if (ret != ESP_OK)
-    {
-        goto fail;
-    }
+    ESP_GOTO_ON_ERROR(vcnl4010_reg_write(dev, VCNL4010_REG_HIGH_THRES + 1, config->interrupt.high_threshold & 0xFF), fail, TAG, "Failed to set high threshold low bite");
 
     uint8_t int_ctrl = ((config->interrupt.count & 0x07) << 5);
     if (config->interrupt.enable_threshold)
@@ -108,11 +80,7 @@ esp_err_t vcnl4010_init(const vcnl4010_config_t *config, vcnl4010_handle_t *ret_
     if (config->interrupt.enable_prox_ready)
         int_ctrl |= VCNL4010_INT_PROX_READY;
 
-    ret = vcnl4010_reg_write(dev, VCNL4010_REG_INT_CTRL, int_ctrl);
-    if (ret != ESP_OK)
-    {
-        goto fail;
-    }
+    ESP_GOTO_ON_ERROR(vcnl4010_reg_write(dev, VCNL4010_REG_INT_CTRL, int_ctrl), fail, TAG, "Failed to set interrupt control");
 
     uint8_t cmd = 0;
     if (config->self_timed)
@@ -122,11 +90,7 @@ esp_err_t vcnl4010_init(const vcnl4010_config_t *config, vcnl4010_handle_t *ret_
     if (config->als_enabled)
         cmd |= VCNL4010_CMD_ALS_EN;
 
-    ret = vcnl4010_reg_write(dev, VCNL4010_REG_COMMAND, cmd);
-    if (ret != ESP_OK)
-    {
-        goto fail;
-    }
+    ESP_GOTO_ON_ERROR(vcnl4010_reg_write(dev, VCNL4010_REG_COMMAND, cmd), fail, TAG, "Failed to set the comand");
 
     *ret_handle = dev;
     return ESP_OK;
@@ -154,6 +118,11 @@ esp_err_t vcnl4010_deinit(vcnl4010_handle_t *handle)
 
 esp_err_t vcnl4010_clear_interrupt(vcnl4010_handle_t handle, uint8_t *status_out)
 {
+    if (handle == NULL || status_out == NULL)
+    {
+        return ESP_ERR_INVALID_ARG;
+    }
+
     uint8_t status = 0;
     ESP_RETURN_ON_ERROR(vcnl4010_reg_read(handle, VCNL4010_REG_INT_STATUS, &status, 1), TAG, "failed reading int status");
     ESP_RETURN_ON_ERROR(vcnl4010_reg_write(handle, VCNL4010_REG_INT_STATUS, status), TAG, "failed clearing int status");
